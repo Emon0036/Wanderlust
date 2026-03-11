@@ -1,0 +1,173 @@
+
+.body{
+font-family: "Roboto", sans-serif !important;
+ display: flex !important;
+ align-items: center !important;
+
+}
+.navbar{
+    height: 5rem;
+    background-color: white;
+}
+
+.fa-compass{
+    color: red;
+    font-size: 3.3rem;
+}
+
+.nav-link{
+    color: black !important;
+}
+
+.card-img-overlay{
+    opacity: 0;
+}
+
+.card-img-overlay:hover{
+    opacity:0.2;
+    background-color: white;
+}
+
+/* ===== Footer ===== */
+footer {
+    background-color: #f9f9f9;
+    border-top: 1px solid #e5e5e5;
+    padding: 24px 16px;
+    margin-top: 40px;
+}
+
+.f-info {
+    max-width: 1200px;
+    margin: 0 auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+
+    text-align: center;
+    color: #555;
+    font-size: 14px;
+}
+
+/* Social Icons */
+.f-into-social {
+    display: flex;
+    gap: 18px;
+    font-size: 20px;
+}
+
+.f-into-social i {
+    color: #555;
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.f-into-social i:hover {
+    color: #0077b5; /* professional blue */
+    transform: translateY(-3px);
+}
+
+/* Footer Links */
+.f-info-links {
+    display: flex;
+    gap: 16px;
+}
+
+.f-info-links a {
+    text-decoration: none;
+    color: #555;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.f-info-links a:hover {
+    color: #000;
+}
+
+/* Copyright text */
+footer div {
+    line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .f-info {
+        font-size: 13px;
+    }
+
+    .f-into-social {
+        font-size: 18px;
+    }
+}
+
+
+/* Page center */
+.page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    background-color: #f4f6f9;
+}
+
+/* Title */
+.page-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #222;
+}
+
+/* Card */
+.listing-card {
+    width: 30rem;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease;
+}
+
+.listing-card:hover {
+    transform: translateY(-6px);
+}
+
+/* Image */
+.card-img-top {
+    width: 20rem;
+    height: 20rem;
+    object-fit: cover;
+}
+
+/* Text */
+.card-text {
+    line-height: 1.7;
+    color: #333;
+}
+
+.card-text .title {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.card-text .price {
+    font-weight: bold;
+    color: #198754;
+}
+
+/* Buttons */
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn {
+    padding: 0.45rem 1.4rem;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+}

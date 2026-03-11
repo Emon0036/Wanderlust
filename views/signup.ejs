@@ -1,0 +1,36 @@
+<% layout("/layout/boilerpelet") %>
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <h2>Signup to Wonderlust</h2>
+            <form action="/signup" method="POST"  novalidate class="needs-validation">
+              <div class="mb-3">
+                 <label class="form-label">Username</label>
+                   <input type="text" name="username" id="username"  class="form-control"  required>
+                      <div class="valid-feedback">
+                   Looks good!
+                      </div>
+        </div>
+
+        <div class="mb-3">
+                 <label class="form-label">Email</label>
+                   <input type="email" name="email" id="email"  class="form-control"  required>
+        </div>
+
+        <div class="mb-3">
+                 <label class="form-label">Password</label>
+                   <input type="password" name="password" id="password"  class="form-control"  required>
+                      <div class="invalid-feedback">
+                  please filled with valid value
+                      </div>
+        </div>
+
+            <button type="submit" class="btn btn-dark w-80">
+        SignUp 
+        </button>
+
+            </form>
+    </div>
+ </div>
+</div>

@@ -1,0 +1,41 @@
+<% layout("/layout/boilerpelet") %>
+
+ 
+
+<div class="container my-4">   <!-- THIS adds left-right space -->
+
+  <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-4">
+    
+    <% for(let list of allData) { %>
+
+      <div class="col">
+        <a href="/listing/<%= list.id %>" class="text-decoration-none text-dark">
+
+          <div class="card h-100 position-relative">
+            <img 
+              src="<%= list.image %>" 
+              class="card-img-top" 
+              class="img-fluid"
+              alt="listing_image" 
+              style="height: 20rem; object-fit: cover;"
+            >
+            <div class="card-img-overlay">Emon</div>
+
+            <div class="card-body">
+              <p class="card-text">
+                <b><%= list.title %></b><br>
+               ৳<%= list.price != null ? list.price.toLocaleString("en-US") : "N/A" %>
+              </p>
+            </div>
+          </div>
+
+        </a>
+      </div>
+
+    <% } %>
+
+  </div>
+</div>
+
+
+

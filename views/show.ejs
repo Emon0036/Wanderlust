@@ -1,0 +1,74 @@
+<% layout("/layout/boilerpelet") %>
+<body>
+    
+<div class="container page-wrapper">
+    <h1 class="page-title"><%=info.title%></h1>
+
+    <div class="card listing-card">
+        <img src="<%=info.image%>" class="card-img-top" alt="Listing-image">
+
+        <div class="card-body">
+            <p class="card-text">
+                <%=info.description%><br><br>
+                <span class="price">
+                   ৳<%=info.price != null ? info.price.toLocaleString("en-US") : "N/A"%>
+                </span><br>
+
+                <%=info.location%>, <%=info.country%>
+            </p>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="/listing/<%=info.id%>/edit" class="btn btn-dark">Edit</a>
+
+        <form action="/listing/<%=info.id%>?_method=DELETE" method="POST">
+            <button type="submit" class="btn btn-outline-danger">Delete</button>
+        </form>
+    </div>
+
+
+    <div class="col-8 offset-3">
+        <hr>
+        <form action="/listing/<%=info.id%>/review" method="POST" novalidate class="needs-validation">
+            <div>
+                <label for="rating" class="form-label">Rating</label>
+                <input class="form-range" type="range" min="1" max="5" name="review[rating]">
+            </div>
+            <div>
+                <label for="review" class="form-label">Message</label>
+                <textarea name="review[message]" id="message" class="form-control" rows="4" placeholder="Enter description" required></textarea>
+            <div class="invalid-feedback">
+             Please add a valid comment for review
+            </div>
+            </div>
+            <br>
+            <button type="submit" class="btn btn-dark w-20">Submit</button>
+        </form>
+    </div>
+
+    <hr>
+    <h4>All Reviews</h4>
+   
+  <div class="row">
+    <%for(let review of info.review)
+    {%>
+    <div class="card col-5 mb-3 ms-5 me-2">
+             <div class="card-body">
+        <p class="card-text">Jonny dev</p>
+         <p class="card-text"><%=review.message%> <br> <%=review.rating%>stars</p>
+        <div class="mt-2">
+            <form method="POST" action="/listing/<%= info.id %>/review/<%= review.id %>?_method=DELETE">
+    <button type="submit" class="btn btn-outline-danger">Delete</button>
+</form>
+        </div>
+     </div>
+    </div>
+
+   <%}%>
+  
+  </div>
+
+</div>
+
+</body>
