@@ -6,10 +6,13 @@
 
     <div class="card listing-card">
         <img src="<%=info.image%>" class="card-img-top" alt="Listing-image">
+        
 
         <div class="card-body">
+            <p class="card-text"><%=info.owner.username%></p>
             <p class="card-text">
-                <%=info.description%><br><br>
+                <%=info.description%>
+                <br><br>
                 <span class="price">
                    ৳<%=info.price != null ? info.price.toLocaleString("en-US") : "N/A"%>
                 </span><br>

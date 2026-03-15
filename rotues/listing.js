@@ -42,15 +42,18 @@ router.get("/new",isLogedIn,(req,res)=>{
 //show route
 router.get("/:id", wrapAsyn(async (req, res) => {
     let {id} = req.params;
-    const info = await Listing.findById(id).populate("review");
+    const info = await Listing.findById(id).populate("review").populate("owner");
+
     if (!info)
     {
         req.flash("error", "That image you have searched for that doesn't exsit!");
         res.redirect("/listing");
     }
     else {
+       // console.log(info);
         res.render("show.ejs",{info});
     }
+
     
 }));
 
@@ -59,6 +62,7 @@ router.get("/:id", wrapAsyn(async (req, res) => {
 router.post("/", isLogedIn,validateListing ,wrapAsyn(async (req, res) => {
    
     let newListing = new Listing(req.body.list);
+    newListing.owner = req.user._id;
     await newListing.save();
     req.flash("success", "You have created new listing");
     res.redirect("/listing");

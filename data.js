@@ -285,8 +285,10 @@ const sampleListings = [
 
 
 let inserData = async()=>{
-  await listing.deleteMany();
-  await listing.insertMany(sampleListings);
+  await listing.deleteMany({});
+ const updateListings = sampleListings.map((obj)=>({...obj,owner:"69b4d4318707dd271c1c32da"}));
+ console.log(updateListings);
+  await listing.insertMany(updateListings);
   console.log("Initialize sucessful");
 }
 
