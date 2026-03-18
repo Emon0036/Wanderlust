@@ -2,24 +2,10 @@ const express = require("express");
 const router = express.Router({mergeParams:true});
 const wrapAsyn = require("../Utility/wrapAsyn.js");
 const customError = require("../Utility/expressError.js");
-const { listingSchema, reviewSchema } = require("../Schema.js");
 const Listing = require("../model/listing.js");
-const {isLogedIn} = require("../isLogedin.js");
+const {isLogedIn,isOwner,validateListing} = require("../isLogedin.js");
 
-//Schema validate middleware
-const validateListing = (req, res, next) => {
-    let {error} = listingSchema.validate(req.body);
-    if (error)
-    {
-        let errMsg = error.details.map((el) => el.message).join(",");
-        console.log(errMsg);
-        throw new customError(404, errMsg);
-    }
-    else
-    {
-        next();
-    }
-}
+
 
 
 //Index route
@@ -42,7 +28,9 @@ router.get("/new",isLogedIn,(req,res)=>{
 //show route
 router.get("/:id", wrapAsyn(async (req, res) => {
     let {id} = req.params;
-    const info = await Listing.findById(id).populate("review").populate("owner");
+    const info = await Listing.findById(id)
+        .populate({ path: "review", populate: { path: "author" } })
+        .populate("owner");
 
     if (!info)
     {
@@ -62,6 +50,7 @@ router.get("/:id", wrapAsyn(async (req, res) => {
 router.post("/", isLogedIn,validateListing ,wrapAsyn(async (req, res) => {
    
     let newListing = new Listing(req.body.list);
+    console.log(req.user);
     newListing.owner = req.user._id;
     await newListing.save();
     req.flash("success", "You have created new listing");
@@ -70,7 +59,7 @@ router.post("/", isLogedIn,validateListing ,wrapAsyn(async (req, res) => {
 
 
 //update route
-router.get("/:id/edit",isLogedIn,wrapAsyn(async (req, res) => {
+router.get("/:id/edit",isLogedIn,isOwner,wrapAsyn(async (req, res) => {
     let {id} = req.params;
     let allinfo = await Listing.findById(id);
     if (!allinfo)
@@ -96,7 +85,7 @@ router.put("/:id",validateListing,isLogedIn, wrapAsyn(async (req, res, next) => 
 
 
 //destroy route
-router.delete("/:id",isLogedIn,wrapAsyn(async (req, res) => {
+router.delete("/:id",isLogedIn,isOwner,wrapAsyn(async (req, res) => {
   if (!req.params)
     {
         throw new customError(400, "send valid data for listing");
