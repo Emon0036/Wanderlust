@@ -1,58 +1,26 @@
 const express = require("express");
 const router = express.Router();
-const user = require("../model/user.js");
 const wrapAsyn = require("../Utility/wrapAsyn.js");
 const passport = require("passport");
 const {originalUrl} = require("../isLogedin.js");
+const controler = require("../Controler/user.js");
 
 router.get("/signup",  (req, res) => {
     res.render("signup.ejs");
 });
 
-router.post("/signup", wrapAsyn(async (req, res) => {
-    try {
-    const { username,email, password } = req.body;
-    const newUser = new user({ username, email});
-    await user.register(newUser, password);
-
- //It's also a method for automatic login after signup
- req.login(newUser, (err)=> {
-  if (err) { 
-    return next(err);
-   }
-    
-   req.flash("success", "You have successfully signed up");
-   res.redirect("/listing");
-  
-});
-    
-    } catch (e) {
-        req.flash("error", e.message);
-         res.redirect("/signup");
-  }
-}));
-
+router.post("/signup", wrapAsyn(controler.signup));
 
 
 router.get("/login", (req, res) => {
     res.render("login.ejs");
 });
 
-
+//login
 router.post("/login",originalUrl,  
   passport.authenticate("local", { failureRedirect: '/login',failureFlash:true }),
-    async (req, res) => {
-        req.flash("success", "Welcome back");
-        if(res.locals.originalUrl)
-        {
-            res.redirect(res.locals.originalUrl);
-        }
-        else
-        {
-           res.redirect("/listing");
-        }
-        
-    });
+  wrapAsyn(controler.login)
+    );
   
 
 //logout   

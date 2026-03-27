@@ -1,6 +1,6 @@
 const listing = require("./model/listing");
 const customError = require("./Utility/expressError.js");
-const { listingSchema, reviewSchema } = require("./Schema.js");
+const { listingSchema, listingUpdateSchema, reviewSchema } = require("./Schema.js");
 
 
 
@@ -54,6 +54,17 @@ module.exports.validateListing = (req, res, next) => {
         next();
     }
 }
+
+// Schema validate middleware for updates (image optional)
+module.exports.validateListingUpdate = (req, res, next) => {
+    let { error } = listingUpdateSchema.validate(req.body);
+    if (error) {
+        let errMsg = error.details.map((el) => el.message).join(",");
+        console.log(errMsg);
+        throw new customError(404, errMsg);
+    }
+    next();
+};
 
 //review validation
 module.exports.validateReview = (req, res, next) => {

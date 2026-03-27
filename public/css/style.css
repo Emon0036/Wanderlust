@@ -172,3 +172,7 @@ footer div {
     transform: scale(1.05);
 }
 
+.listing-map {
+    height: 340px;
+    width: 100%;
+}

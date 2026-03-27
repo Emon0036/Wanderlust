@@ -1,5 +1,4 @@
 <% layout("/layout/boilerpelet") %>
-<body>
     
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -7,7 +6,7 @@
             <h1 class="mb-4 text-center"><%= info.title %></h1>
             
             <div class="card shadow-sm border-0 mb-4">
-                <img src="<%= info.image %>" class="card-img-top rounded" alt="Listing-image" style="max-height: 500px; object-fit: cover;">
+                <img src="<%= (info.image && info.image.url) ? info.image.url : info.image %>" class="card-img-top rounded" alt="Listing-image" style="max-height: 500px; object-fit: cover;">
                 <div class="card-body">
                     <h5 class="card-title text-muted">Owned by: <%= info.owner.username %></h5>
                     <p class="card-text fs-5"><%= info.description %></p>
@@ -20,6 +19,17 @@
                             <i class="fa-solid fa-location-dot me-1"></i><%= info.location %>, <%= info.country %>
                         </span>
                     </p>
+
+                    <div class="mt-3">
+                        <h6 class="text-muted mb-2">Map</h6>
+                        <div
+                            id="listing-map"
+                            class="listing-map rounded"
+                            data-query="<%= (info.location || '') + ', ' + (info.country || '') %>"
+                            data-geometry="<%= encodeURIComponent(JSON.stringify(info.geometry || null)) %>"
+                        ></div>
+                        <div id="listing-map-error" class="form-text d-none"></div>
+                    </div>
                 </div>
             </div>
 
@@ -37,11 +47,20 @@
             <div class="my-5">
                 <h4>Leave a Review</h4>
                 <form action="/listing/<%= info.id %>/review" method="POST" novalidate class="needs-validation">
-                    <div class="mb-3">
-                        <label for="rating" class="form-label">Rating</label>
-                        <input class="form-range" type="range" min="1" max="5" name="review[rating]" id="rating">
-                    </div>
-                    <div class="mb-3">
+
+<fieldset class="starability-checkmark">
+  <input type="radio" id="first-rate1" name="review[rating]" value="1" required />
+  <label for="first-rate1" title="Terrible">1 star</label>
+  <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+  <label for="first-rate2" title="Not good" >2 stars</label>
+  <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+  <label for="first-rate3" title="Average">3 stars</label>
+  <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+  <label for="first-rate4" title="Very good">4 stars</label>
+  <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+  <label for="first-rate5" title="Amazing">5 stars</label>
+</fieldset>
+                <div class="mb-4">
                         <label for="message" class="form-label">Comments</label>
                         <textarea name="review[message]" id="message" class="form-control" rows="4" placeholder="Share your experience..." required></textarea>
                         <div class="invalid-feedback">
@@ -61,12 +80,8 @@
                             <div class="card h-100 shadow-sm">
                             <div class="card-body">
                                 <h6 class="card-subtitle mb-2 text-muted"><%= review.author ? review.author.username : "Unknown user" %></h6>
-                                <p class="card-text"><%= review.message %></p>
-                                <p class="card-text text-warning">
-                                    <% for(let i=0; i<5; i++) { %>
-                                        <i class="fa-<%= i < review.rating ? 'solid' : 'regular' %> fa-star"></i>
-                                    <% } %>
-                                </p>
+                                 <p class="starability-result mb-2" data-rating="<%= review.rating %>"></p>
+                                <p class="card-text mb-2"><%= review.message %></p>
                                 <form method="POST" action="/listing/<%= info.id %>/review/<%= review.id %>?_method=DELETE">
                                     <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                                 </form>
@@ -79,4 +94,85 @@
     </div>
 </div>
 
-</body>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const mapEl = document.getElementById("listing-map");
+        const errorEl = document.getElementById("listing-map-error");
+        if (!mapEl) return;
+
+        const query = mapEl.dataset.query || "";
+        let geometry = null;
+        try {
+            geometry = JSON.parse(decodeURIComponent(mapEl.dataset.geometry || "null"));
+        } catch (e) {
+            geometry = null;
+        }
+
+        if (typeof L === "undefined") {
+            if (errorEl) {
+                errorEl.classList.remove("d-none");
+                errorEl.textContent = "Map failed to load. Please refresh the page.";
+            }
+            return;
+        }
+
+        const map = L.map(mapEl, { scrollWheelZoom: false }).setView([0, 0], 2);
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            attribution: "&copy; OpenStreetMap contributors",
+        }).addTo(map);
+
+        const showError = (message) => {
+            if (!errorEl) return;
+            errorEl.classList.remove("d-none");
+            errorEl.textContent = message;
+        };
+
+        const renderFromGeometry = () => {
+            if (!geometry || !Array.isArray(geometry.coordinates) || geometry.coordinates.length !== 2) return false;
+
+            const lng = Number(geometry.coordinates[0]);
+            const lat = Number(geometry.coordinates[1]);
+            if (!Number.isFinite(lat) || !Number.isFinite(lng)) return false;
+
+            map.setView([lat, lng], 12);
+            L.marker([lat, lng]).addTo(map).bindPopup(query).openPopup();
+            return true;
+        };
+
+        const geocode = async () => {
+            if (!query || !query.trim()) {
+                showError("No location available for this listing.");
+                return;
+            }
+
+            try {
+                const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`;
+                const res = await fetch(url, { headers: { Accept: "application/json" } });
+                if (!res.ok) throw new Error("Geocoding request failed");
+                const data = await res.json();
+                if (!Array.isArray(data) || data.length === 0) {
+                    showError("Couldn't find this location on the map.");
+                    return;
+                }
+
+                const lat = Number(data[0].lat);
+                const lon = Number(data[0].lon);
+                if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+                    showError("Couldn't locate this place on the map.");
+                    return;
+                }
+
+                map.setView([lat, lon], 12);
+                L.marker([lat, lon]).addTo(map).bindPopup(query).openPopup();
+            } catch (e) {
+                showError("Map lookup failed. Please try again later.");
+            }
+        };
+
+        if (!renderFromGeometry()) {
+            geocode();
+        }
+    });
+</script>

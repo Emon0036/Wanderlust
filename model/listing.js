@@ -10,10 +10,17 @@ const listingSchema = Schema({
     },
     description:String,
     image:{
-       type: String,
-       default:"https://img.freepik.com/free-photo/cascade-boat-clean-china-natural-rural_1417-1356.jpg?t=st=1770976298~exp=1770979898~hmac=2b897eaf14ef6ebb11b34f9b0ed06987f6565a9db8674dcc8e9e50b9b9c223c4&w=1060 ",
-
-       set:(v)=> v===""?"https://img.freepik.com/free-photo/cascade-boat-clean-china-natural-rural_1417-1356.jpg?t=st=1770976298~exp=1770979898~hmac=2b897eaf14ef6ebb11b34f9b0ed06987f6565a9db8674dcc8e9e50b9b9c223c4&w=1060 " : v,
+       url:String,
+       filename:String,
+    },
+    geometry: {
+        type: {
+            type: String,
+            enum: ["Point"],
+        },
+        coordinates: {
+            type: [Number], // [lng, lat]
+        },
     },
     price:Number,
     location:String,
