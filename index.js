@@ -14,7 +14,9 @@ const Listing = require("./model/listing.js");
 const methodOverride = require("method-override");
 const engine = require("ejs-mate");
 const customError = require("./Utility/expressError.js"); 
-const session = require("express-session");  
+const session = require("express-session"); 
+const connectMongo = require("connect-mongo");
+const MongoStore = connectMongo.MongoStore || connectMongo.default;
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
@@ -25,6 +27,8 @@ const listing = require("./rotues/listing.js");
 const review = require("./rotues/review.js");
 const user = require("./rotues/user.js");
 
+
+
 app.set("views",path.join(__dirname,"views"));
 app.set("view engine","ejs");
 app.use(express.urlencoded({extended:true}));
@@ -32,7 +36,16 @@ app.use(methodOverride("_method"));
 app.engine('ejs', engine);
 app.use(express.static(path.join(__dirname, "/public")));
 
+
+const store = MongoStore.create({
+  mongoUrl: process.env.ATLAS_DB,
+  crypto: {
+    secret: "mysupersecret",
+  },
+  touchAfter: 24 * 3600,
+});
 const sessions = {
+    store,
     secret: 'keyboard cat',
     resave: false,
     saveUninitialized: true,
@@ -45,6 +58,9 @@ const sessions = {
 
 
 
+
+
+
 main().then(()=>{
     console.log("Server is working");
 }).catch((err)=>{
@@ -52,8 +68,12 @@ main().then(()=>{
 });
 
 async function main() {
-  await mongoose.connect('mongodb://127.0.0.1:27017/wonderlust');
-
+  try {
+    await mongoose.connect(process.env.ATLAS_DB);
+    console.log("✅ DB Connected");
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 // All these are for athuentication
@@ -104,6 +124,6 @@ app.listen(8080,()=>{
   console.log("server is running");
 });
 
-app.get("/",(req,res)=>{
-    res.send("Welcome into this page");
-})
+// app.get("/",(req,res)=>{
+//     res.send("Welcome into this page");
+// })
